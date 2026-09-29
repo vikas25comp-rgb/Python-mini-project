@@ -1,0 +1,15 @@
+# Environment & sensitive credentials (NEVER commit to GitHub)
+.env
+
+# Python cache & virtual environments
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+
+# IDE files
+.vscode/
+.idea/
+*.swp

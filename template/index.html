@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MahaDBT Scholarship Application and Status Tracker</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+  <!-- Top Announcement Bar -->
+  <div class="top-bar">
+    <span>Government of Maharashtra - MahaDBT Scholarship Portal Simulation</span>
+    <span>Academic Year 2024-2025</span>
+  </div>
+
+  <!-- Main Navigation Bar -->
+  <header>
+    <div class="nav-container">
+      <a href="{{ url_for('index') }}" class="logo-area">
+        <div class="emblem-icon">M</div>
+        <div class="logo-text">
+          <h1>MahaDBT Scholarship Tracker</h1>
+          <span>Direct Benefit Transfer & Status System</span>
+        </div>
+      </a>
+      <nav>
+        <ul>
+          <li><a href="{{ url_for('index') }}" class="active">Home</a></li>
+          <li><a href="{{ url_for('track') }}">Track Application</a></li>
+          <li><a href="{{ url_for('application') }}">Apply Online</a></li>
+          {% if session.get('student_id') %}
+            <li><a href="{{ url_for('dashboard') }}">Dashboard ({{ session.get('student_name') }})</a></li>
+            <li><a href="{{ url_for('logout') }}" class="btn-sm btn-danger">Logout</a></li>
+          {% else %}
+            <li><a href="{{ url_for('login') }}">Student Login</a></li>
+          {% endif %}
+          {% if session.get('admin_id') %}
+            <li><a href="{{ url_for('admin') }}" class="nav-btn-highlight">Admin Desk</a></li>
+          {% else %}
+            <li><a href="{{ url_for('admin_login') }}" class="nav-btn-highlight">Admin Login</a></li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Body Content -->
+  <main class="main-container">
+
+    {% if db_error %}
+      <div class="alert alert-warning">
+        <strong>Note:</strong> {{ db_error }}
+      </div>
+    {% endif %}
+
+    <!-- Hero Section -->
+    <section class="hero">
+      <h2>MahaDBT Scholarship Application & Status Tracker</h2>
+      <p>
+        An integrated college portal to apply for government scholarship schemes, 
+        verify submitted documents, and track multi-level scrutiny stages in real time.
+      </p>
+      <div class="hero-actions">
+        <a href="{{ url_for('application') }}" class="btn btn-primary" style="background: #ff9800;">Apply for Scholarship</a>
+        <a href="{{ url_for('track') }}" class="btn btn-outline" style="color: #ffffff; border-color: #ffffff;">Track Your Status</a>
+        <a href="{{ url_for('login') }}" class="btn btn-secondary">Student Login</a>
+      </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">How the Portal Works</h2>
+      </div>
+      <div class="grid-3" style="text-align: center;">
+        <div style="padding: 15px; background: #f8fafd; border-radius: 8px;">
+          <div style="font-size: 2rem; color: #0d47a1; margin-bottom: 8px;">1</div>
+          <h4 style="margin-bottom: 6px;">Submit Application</h4>
+          <p style="font-size: 0.88rem; color: #546e7a;">Select eligible scheme, upload necessary academic and caste/income documents.</p>
+        </div>
+        <div style="padding: 15px; background: #f8fafd; border-radius: 8px;">
+          <div style="font-size: 2rem; color: #f57f17; margin-bottom: 8px;">2</div>
+          <h4 style="margin-bottom: 6px;">Department Scrutiny</h4>
+          <p style="font-size: 0.88rem; color: #546e7a;">College clerk and welfare officer scrutinize certificate validity and eligibility.</p>
+        </div>
+        <div style="padding: 15px; background: #f8fafd; border-radius: 8px;">
+          <div style="font-size: 2rem; color: #2e7d32; margin-bottom: 8px;">3</div>
+          <h4 style="margin-bottom: 6px;">Approval & Tracking</h4>
+          <p style="font-size: 0.88rem; color: #546e7a;">Track application status online at each milestone until sanction and approval.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Scholarship Schemes (Dynamically Loaded from PostgreSQL) -->
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">Available Scholarship Schemes</h2>
+        <span style="font-size: 0.88rem; color: var(--text-muted);">Loaded live from PostgreSQL database</span>
+      </div>
+
+      {% if schemes %}
+        <div class="grid-3">
+          {% for scheme in schemes %}
+            <div class="card scheme-card">
+              <div>
+                <span class="scheme-dept">{{ scheme.department }}</span>
+                <h3>{{ scheme.scheme_name }}</h3>
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 12px;">
+                  {{ scheme.description }}
+                </p>
+                <div style="background: #f1f5f9; padding: 10px; border-radius: 6px; font-size: 0.85rem; margin-bottom: 15px;">
+                  <strong>Eligibility:</strong> {{ scheme.eligibility }}
+                </div>
+              </div>
+              <a href="{{ url_for('application') }}?scheme_id={{ scheme.scheme_id }}" class="btn btn-outline btn-sm" style="text-align: center;">
+                Apply for this Scheme &rarr;
+              </a>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p style="color: var(--text-muted); text-align: center; padding: 30px;">
+          No schemes found in the database. Please initialize the database with <code>sample_data.sql</code>.
+        </p>
+      {% endif %}
+    </div>
+
+  </main>
+
+  <footer>
+    <p><strong>MahaDBT Scholarship Application and Status Tracker</strong></p>
+    <p>Python Flask & PostgreSQL College Full-Stack Project &copy; 2024-2025</p>
+  </footer>
+
+</body>
+</html>

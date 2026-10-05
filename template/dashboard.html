@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Dashboard - MahaDBT Tracker</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+  <!-- Top Announcement Bar -->
+  <div class="top-bar">
+    <span>Government of Maharashtra - MahaDBT Scholarship Portal Simulation</span>
+    <span>Logged In as Student: {{ student.name if student else 'Guest' }}</span>
+  </div>
+
+  <!-- Header -->
+  <header>
+    <div class="nav-container">
+      <a href="{{ url_for('index') }}" class="logo-area">
+        <div class="emblem-icon">M</div>
+        <div class="logo-text">
+          <h1>MahaDBT Scholarship Tracker</h1>
+          <span>Direct Benefit Transfer & Status System</span>
+        </div>
+      </a>
+      <nav>
+        <ul>
+          <li><a href="{{ url_for('index') }}">Home</a></li>
+          <li><a href="{{ url_for('track') }}">Track Application</a></li>
+          <li><a href="{{ url_for('application') }}">Apply for Scholarship</a></li>
+          <li><a href="{{ url_for('dashboard') }}" class="active">Dashboard</a></li>
+          <li><a href="{{ url_for('logout') }}" class="btn-sm btn-danger">Logout</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-container">
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, msg in messages %}
+          <div class="alert alert-{{ category }}">
+            {{ msg }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- Student Profile Header Card -->
+    {% if student %}
+    <div class="card" style="border-left: 5px solid var(--accent-color);">
+      <div class="card-header">
+        <div>
+          <h2 class="card-title">Welcome, {{ student.name }}</h2>
+          <span style="font-size: 0.88rem; color: var(--text-muted);">Student ID: #{{ student.student_id }}</span>
+        </div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <a href="{{ url_for('application') }}" class="btn btn-primary btn-sm">+ Apply for Scholarship</a>
+          <a href="{{ url_for('logout') }}" class="btn btn-danger btn-sm">Logout</a>
+        </div>
+      </div>
+
+      <div class="grid-3" style="margin-top: 15px;">
+        <div class="detail-item">
+          <span class="label">Course</span>
+          <span class="value">{{ student.course }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Current Year</span>
+          <span class="value">{{ student.year }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Category</span>
+          <span class="value"><span class="badge badge-submitted">{{ student.category }}</span></span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Email Address</span>
+          <span class="value" style="font-size: 0.9rem;">{{ student.email }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Mobile Number</span>
+          <span class="value">{{ student.mobile }}</span>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Applications Table Card -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">My Scholarship Applications</h3>
+        <div style="display: flex; gap: 10px;">
+          <a href="{{ url_for('track') }}" class="btn btn-secondary btn-sm">Track Any Application</a>
+          <a href="{{ url_for('application') }}" class="btn btn-primary btn-sm">New Application</a>
+        </div>
+      </div>
+
+      {% if applications and applications|length > 0 %}
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Application ID</th>
+                <th>Scholarship Name</th>
+                <th>Academic Year</th>
+                <th>Application Date</th>
+                <th>Current Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for app in applications %}
+                <tr>
+                  <td><strong>#{{ app.application_id }}</strong></td>
+                  <td>
+                    <strong>{{ app.scheme_name }}</strong>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">{{ app.department }}</div>
+                  </td>
+                  <td>{{ app.academic_year }}</td>
+                  <td>{{ app.application_date }}</td>
+                  <td>
+                    {% if app.current_status == 'Approved' %}
+                      <span class="badge badge-approved">{{ app.current_status }}</span>
+                    {% elif app.current_status == 'Rejected' %}
+                      <span class="badge badge-rejected">{{ app.current_status }}</span>
+                    {% elif app.current_status == 'Under Scrutiny' %}
+                      <span class="badge badge-under-scrutiny">{{ app.current_status }}</span>
+                    {% elif app.current_status == 'Documents Pending' %}
+                      <span class="badge badge-documents-pending">{{ app.current_status }}</span>
+                    {% else %}
+                      <span class="badge badge-submitted">{{ app.current_status }}</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <a href="{{ url_for('track') }}?app_id={{ app.application_id }}" class="btn btn-outline btn-sm">
+                      Track Application &rarr;
+                    </a>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div style="text-align: center; padding: 40px 20px;">
+          <p style="color: var(--text-muted); margin-bottom: 15px;">You have not submitted any scholarship applications yet.</p>
+          <a href="{{ url_for('application') }}" class="btn btn-primary">Apply for Your First Scholarship</a>
+        </div>
+      {% endif %}
+    </div>
+
+  </main>
+
+  <footer>
+    <p><strong>MahaDBT Scholarship Application and Status Tracker</strong></p>
+    <p>Python Flask & PostgreSQL College Full-Stack Project &copy; 2024-2025</p>
+  </footer>
+
+</body>
+</html>

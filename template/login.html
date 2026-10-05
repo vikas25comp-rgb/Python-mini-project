@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Login - MahaDBT Tracker</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+  <!-- Top Announcement Bar -->
+  <div class="top-bar">
+    <span>Government of Maharashtra - MahaDBT Scholarship Portal Simulation</span>
+    <span>Student Authentication</span>
+  </div>
+
+  <!-- Header -->
+  <header>
+    <div class="nav-container">
+      <a href="{{ url_for('index') }}" class="logo-area">
+        <div class="emblem-icon">M</div>
+        <div class="logo-text">
+          <h1>MahaDBT Scholarship Tracker</h1>
+          <span>Direct Benefit Transfer & Status System</span>
+        </div>
+      </a>
+      <nav>
+        <ul>
+          <li><a href="{{ url_for('index') }}">Home</a></li>
+          <li><a href="{{ url_for('track') }}">Track Application</a></li>
+          <li><a href="{{ url_for('application') }}">Apply Online</a></li>
+          <li><a href="{{ url_for('login') }}" class="active">Student Login</a></li>
+          {% if session.get('admin_id') %}
+            <li><a href="{{ url_for('admin') }}" class="nav-btn-highlight">Admin Desk</a></li>
+          {% else %}
+            <li><a href="{{ url_for('admin_login') }}" class="nav-btn-highlight">Admin Login</a></li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-container" style="max-width: 800px;">
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, msg in messages %}
+          <div class="alert alert-{{ category }}">
+            {{ msg }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {% if error %}
+      <div class="alert alert-danger">
+        <strong>Error:</strong> {{ error }}
+      </div>
+    {% endif %}
+
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">Student Portal Login</h2>
+        <span style="font-size: 0.85rem; color: var(--text-muted);">Enter your registered student credentials</span>
+      </div>
+
+      <form action="{{ url_for('login') }}" method="POST">
+        <div class="form-group">
+          <label for="email">Student Email Address *</label>
+          <input type="email" id="email" name="email" class="form-control" placeholder="e.g. rahul.sharma@example.com" required>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password *</label>
+          <input type="password" id="password" name="password" class="form-control" placeholder="Enter password" required>
+        </div>
+
+        <div style="margin-top: 20px;">
+          <button type="submit" class="btn btn-primary" style="width: 100%;">Log In to Dashboard</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Sample Credentials Reference Card -->
+    <div class="card" style="background-color: #f8fafd; border: 1px dashed #90caf9;">
+      <h3 style="font-size: 0.95rem; color: var(--primary-dark); margin-bottom: 8px;">
+        Sample Emails:
+      </h3>
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Student Name</th>
+              <th>Email</th>
+              <th>Password</th>
+              <th>Course / Category</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Rahul Sharma</strong></td>
+              <td><code>rahul.sharma@example.com</code></td>
+              <td><code>student123</code></td>
+              <td>B.Tech Computer (OBC)</td>
+            </tr>
+            <tr>
+              <td><strong>Priya Patil</strong></td>
+              <td><code>priya.patil@example.com</code></td>
+              <td><code>student123</code></td>
+              <td>B.E. IT (Open)</td>
+            </tr>
+            <tr>
+              <td><strong>Amit Kamble</strong></td>
+              <td><code>amit.kamble@example.com</code></td>
+              <td><code>student123</code></td>
+              <td>B.Tech Mech (SC)</td>
+            </tr>
+            <tr>
+              <td><strong>Sneha Deshmukh</strong></td>
+              <td><code>sneha.deshmukh@example.com</code></td>
+              <td><code>student123</code></td>
+              <td>B.Pharmacy (EBC)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <footer>
+    <p><strong>MahaDBT Scholarship Application and Status Tracker</strong></p>
+    <p>Python Flask & PostgreSQL College Full-Stack Project &copy; 2024-2025</p>
+  </footer>
+
+</body>
+</html>

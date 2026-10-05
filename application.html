@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apply for Scholarship - MahaDBT Tracker</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+  <!-- Top Announcement Bar -->
+  <div class="top-bar">
+    <span>Government of Maharashtra - MahaDBT Scholarship Portal Simulation</span>
+    <span>New Online Application Form</span>
+  </div>
+
+  <!-- Header -->
+  <header>
+    <div class="nav-container">
+      <a href="{{ url_for('index') }}" class="logo-area">
+        <div class="emblem-icon">M</div>
+        <div class="logo-text">
+          <h1>MahaDBT Scholarship Tracker</h1>
+          <span>Direct Benefit Transfer & Status System</span>
+        </div>
+      </a>
+      <nav>
+        <ul>
+          <li><a href="{{ url_for('index') }}">Home</a></li>
+          <li><a href="{{ url_for('track') }}">Track Application</a></li>
+          <li><a href="{{ url_for('application') }}" class="active">Apply Online</a></li>
+          {% if session.get('student_id') %}
+            <li><a href="{{ url_for('dashboard') }}">Dashboard ({{ session.get('student_name') }})</a></li>
+            <li><a href="{{ url_for('logout') }}" class="btn-sm btn-danger">Logout</a></li>
+          {% else %}
+            <li><a href="{{ url_for('login') }}">Student Login</a></li>
+          {% endif %}
+          {% if session.get('admin_id') %}
+            <li><a href="{{ url_for('admin') }}" class="nav-btn-highlight">Admin Desk</a></li>
+          {% else %}
+            <li><a href="{{ url_for('admin_login') }}" class="nav-btn-highlight">Admin Login</a></li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-container" style="max-width: 850px;">
+
+    <!-- Success Message -->
+    {% if success_message %}
+      <div class="alert alert-success" style="flex-direction: column; align-items: flex-start;">
+        <div style="font-size: 1.05rem; font-weight: 700; margin-bottom: 5px;">
+          🎉 Submission Successful!
+        </div>
+        <p>{{ success_message }}</p>
+        <div style="margin-top: 10px;">
+          <a href="{{ url_for('track') }}" class="btn btn-sm btn-success" style="background: #1b5e20;">
+            Track Your Status Now &rarr;
+          </a>
+        </div>
+      </div>
+    {% endif %}
+
+    <!-- Error Message -->
+    {% if error %}
+      <div class="alert alert-danger">
+        <strong>Error:</strong> {{ error }}
+      </div>
+    {% endif %}
+
+    <!-- Application Form Card -->
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">Scholarship Application Form</h2>
+        <span style="font-size: 0.85rem; color: var(--text-muted);">All fields are processed directly into PostgreSQL</span>
+      </div>
+
+      <form action="{{ url_for('application') }}" method="POST">
+
+        <!-- Student ID -->
+        <div class="form-group">
+          <label for="student_id">Student ID *</label>
+          <input type="number" id="student_id" name="student_id" class="form-control" 
+                 placeholder="Enter your Student ID (e.g. 1, 2, 3, 4, 5)"
+                 value="{{ logged_in_student_id if logged_in_student_id else '' }}" required>
+          <small style="color: var(--text-muted); font-size: 0.8rem;">
+            {% if logged_in_student_id %}
+              ✓ Auto-filled from your logged-in student account.
+            {% else %}
+              Tip: You can log in first, or enter a registered Student ID (e.g. 1 for Rahul Sharma, 2 for Priya Patil).
+            {% endif %}
+          </small>
+        </div>
+
+        <!-- Scholarship Scheme Selection -->
+        <div class="form-group">
+          <label for="scheme_id">Scholarship Scheme *</label>
+          <select id="scheme_id" name="scheme_id" class="form-control" required>
+            <option value="">-- Select Scholarship Scheme --</option>
+            {% for s in schemes %}
+              <option value="{{ s.scheme_id }}" {% if request.args.get('scheme_id') == s.scheme_id|string %}selected{% endif %}>
+                {{ s.scheme_name }} ({{ s.department }})
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Academic Year -->
+        <div class="form-group">
+          <label for="academic_year">Academic Year *</label>
+          <select id="academic_year" name="academic_year" class="form-control" required>
+            <option value="2024-2025" selected>2024-2025</option>
+            <option value="2025-2026">2025-2026</option>
+          </select>
+        </div>
+
+        <!-- Application Date -->
+        <div class="form-group">
+          <label for="application_date">Application Date</label>
+          <input type="text" id="application_date" class="form-control" value="Current Date (Auto-assigned by Database)" readonly style="background-color: #f1f5f9;">
+        </div>
+
+        <!-- Document Names -->
+        <div class="form-group">
+          <label for="document_name">Document Name(s) to Submit *</label>
+          <input type="text" id="document_name" name="document_name" class="form-control" 
+                 placeholder="e.g. Income Certificate, Domicile Certificate, CAP Allotment Letter" 
+                 value="Income Certificate, Domicile Certificate, Marksheet" required>
+          <small style="color: var(--text-muted); font-size: 0.8rem;">
+            Separate multiple document names with commas. Each document will be recorded in the PostgreSQL <code>documents</code> table.
+          </small>
+        </div>
+
+        <!-- Submit Button -->
+        <div style="margin-top: 25px;">
+          <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 1rem;">
+            Submit Scholarship Application
+          </button>
+        </div>
+      </form>
+    </div>
+
+  </main>
+
+  <footer>
+    <p><strong>MahaDBT Scholarship Application and Status Tracker</strong></p>
+    <p>Python Flask & PostgreSQL College Full-Stack Project &copy; 2024-2025</p>
+  </footer>
+
+</body>
+</html>

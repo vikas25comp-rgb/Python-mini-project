@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Scrutiny Portal - MahaDBT Tracker</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+  <!-- Top Announcement Bar -->
+  <div class="top-bar">
+    <span>Government of Maharashtra - MahaDBT Scholarship Portal Simulation</span>
+    <span>Logged In: {{ session.get('admin_name') }} ({{ session.get('admin_role') }})</span>
+  </div>
+
+  <!-- Header -->
+  <header>
+    <div class="nav-container">
+      <a href="{{ url_for('index') }}" class="logo-area">
+        <div class="emblem-icon">M</div>
+        <div class="logo-text">
+          <h1>MahaDBT Scholarship Tracker</h1>
+          <span>Direct Benefit Transfer & Status System</span>
+        </div>
+      </a>
+      <nav>
+        <ul>
+          <li><a href="{{ url_for('index') }}">Home</a></li>
+          <li><a href="{{ url_for('track') }}">Track Application</a></li>
+          <li><a href="{{ url_for('application') }}">Apply Online</a></li>
+          <li><a href="{{ url_for('admin') }}" class="active nav-btn-highlight">Admin Desk</a></li>
+          <li><a href="{{ url_for('admin_logout') }}" class="btn-sm btn-danger">Logout</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-container">
+
+    <!-- Flash / Success / Error Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, msg in messages %}
+          <div class="alert alert-{{ category }}">
+            {{ msg }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {% if success_message %}
+      <div class="alert alert-success">
+        <strong>Success:</strong> {{ success_message }}
+      </div>
+    {% endif %}
+
+    {% if error %}
+      <div class="alert alert-danger">
+        <strong>Notice:</strong> {{ error }}
+      </div>
+    {% endif %}
+
+    <!-- Admin Overview Card -->
+    <div class="card" style="border-top: 4px solid var(--accent-color);">
+      <div class="card-header">
+        <div>
+          <h2 class="card-title">Administrative Scrutiny & Approval Desk</h2>
+          <span style="font-size: 0.88rem; color: var(--text-muted);">
+            Officer: <strong>{{ session.get('admin_name') }}</strong> | Role: <strong>{{ session.get('admin_role') }}</strong>
+          </span>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <span class="badge badge-submitted" style="font-size: 0.9rem;">Total Applications: {{ applications|length }}</span>
+          <a href="{{ url_for('admin_logout') }}" class="btn btn-sm btn-danger">Logout</a>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Application ID</th>
+              <th>Student Name</th>
+              <th>Scholarship</th>
+              <th>Academic Year</th>
+              <th>Current Status</th>
+              <th style="min-width: 320px;">Action (Update Status & Remarks)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if applications and applications|length > 0 %}
+              {% for app in applications %}
+                <tr>
+                  <td>
+                    <strong>#{{ app.application_id }}</strong>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">{{ app.application_date }}</div>
+                  </td>
+                  <td>
+                    <strong>{{ app.student_name }}</strong>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">{{ app.student_email }}</div>
+                  </td>
+                  <td style="max-width: 250px;">
+                    <span title="{{ app.scheme_name }}">{{ app.scheme_name }}</span>
+                  </td>
+                  <td>{{ app.academic_year }}</td>
+                  <td>
+                    {% if app.current_status == 'Approved' %}
+                      <span class="badge badge-approved">{{ app.current_status }}</span>
+                    {% elif app.current_status == 'Rejected' %}
+                      <span class="badge badge-rejected">{{ app.current_status }}</span>
+                    {% elif app.current_status == 'Under Scrutiny' %}
+                      <span class="badge badge-under-scrutiny">{{ app.current_status }}</span>
+                    {% elif app.current_status == 'Documents Pending' %}
+                      <span class="badge badge-documents-pending">{{ app.current_status }}</span>
+                    {% else %}
+                      <span class="badge badge-submitted">{{ app.current_status }}</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <!-- Admin Status Update Form -->
+                    <form action="{{ url_for('admin') }}" method="POST" style="display: flex; flex-direction: column; gap: 8px;">
+                      <input type="hidden" name="application_id" value="{{ app.application_id }}">
+                      
+                      <div style="display: flex; gap: 6px;">
+                        <select name="new_status" class="form-control" style="font-size: 0.85rem; padding: 6px 10px;" required>
+                          <option value="Submitted" {% if app.current_status == 'Submitted' %}selected{% endif %}>Submitted</option>
+                          <option value="Under Scrutiny" {% if app.current_status == 'Under Scrutiny' %}selected{% endif %}>Under Scrutiny</option>
+                          <option value="Documents Pending" {% if app.current_status == 'Documents Pending' %}selected{% endif %}>Documents Pending</option>
+                          <option value="Approved" {% if app.current_status == 'Approved' %}selected{% endif %}>Approved</option>
+                          <option value="Rejected" {% if app.current_status == 'Rejected' %}selected{% endif %}>Rejected</option>
+                        </select>
+
+                        <button type="submit" class="btn btn-sm btn-primary" style="white-space: nowrap;">
+                          Save Update
+                        </button>
+                      </div>
+
+                      <input type="text" name="remarks" class="form-control" 
+                             placeholder="Enter official remark (e.g. Verified by clerk)" 
+                             style="font-size: 0.82rem; padding: 6px 10px;">
+                    </form>
+                    
+                    <div style="margin-top: 6px; text-align: right;">
+                      <a href="{{ url_for('track') }}?app_id={{ app.application_id }}" style="font-size: 0.8rem; color: var(--accent-color); text-decoration: none;">
+                        View Full History &rarr;
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 30px;">
+                  No applications found in the database.
+                </td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <footer>
+    <p><strong>MahaDBT Scholarship Application and Status Tracker</strong></p>
+    <p>Python Flask & PostgreSQL College Full-Stack Project &copy; 2024-2025</p>
+  </footer>
+
+</body>
+</html>

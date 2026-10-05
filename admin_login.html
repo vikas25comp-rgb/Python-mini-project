@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login - MahaDBT Tracker</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+  <!-- Top Announcement Bar -->
+  <div class="top-bar">
+    <span>Government of Maharashtra - MahaDBT Scholarship Portal Simulation</span>
+    <span>Authority / Scrutiny Officer Authentication</span>
+  </div>
+
+  <!-- Header -->
+  <header>
+    <div class="nav-container">
+      <a href="{{ url_for('index') }}" class="logo-area">
+        <div class="emblem-icon">M</div>
+        <div class="logo-text">
+          <h1>MahaDBT Scholarship Tracker</h1>
+          <span>Direct Benefit Transfer & Status System</span>
+        </div>
+      </a>
+      <nav>
+        <ul>
+          <li><a href="{{ url_for('index') }}">Home</a></li>
+          <li><a href="{{ url_for('track') }}">Track Application</a></li>
+          <li><a href="{{ url_for('application') }}">Apply Online</a></li>
+          <li><a href="{{ url_for('login') }}">Student Login</a></li>
+          <li><a href="{{ url_for('admin_login') }}" class="active nav-btn-highlight">Admin Login</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-container" style="max-width: 650px;">
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, msg in messages %}
+          <div class="alert alert-{{ category }}">
+            {{ msg }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {% if error %}
+      <div class="alert alert-danger">
+        <strong>Error:</strong> {{ error }}
+      </div>
+    {% endif %}
+
+    <!-- Admin Login Card -->
+    <div class="card" style="border-top: 4px solid #002171;">
+      <div class="card-header">
+        <div>
+          <h2 class="card-title">Admin Scrutiny Portal Login</h2>
+          <span style="font-size: 0.85rem; color: var(--text-muted);">Restricted to Authorized Verification Officers</span>
+        </div>
+      </div>
+
+      <form action="{{ url_for('admin_login') }}" method="POST">
+        <div class="form-group">
+          <label for="login_id">Admin Username or Email *</label>
+          <input type="text" id="login_id" name="login_id" class="form-control" 
+                 placeholder="e.g. admin or admin@mahadbt.gov.in" required autofocus>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password *</label>
+          <input type="password" id="password" name="password" class="form-control" 
+                 placeholder="Enter password" required>
+        </div>
+
+        <div style="margin-top: 20px;">
+          <button type="submit" class="btn btn-primary" style="width: 100%; background-color: #002171;">
+            Log In to Admin Portal
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Sample Credentials Reference Card -->
+    <div class="card" style="background-color: #f8fafd; border: 1px dashed #90caf9;">
+      <h3 style="font-size: 0.95rem; color: var(--primary-dark); margin-bottom: 8px;">
+        Sample Emails:
+      </h3>
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Role</th>
+              <th>Email</th>
+              <th>Password</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Head Scrutiny Officer</strong></td>
+              <td><code>admin@mahadbt.gov.in</code> (or <code>admin</code>)</td>
+              <td><code>admin123</code></td>
+            </tr>
+            <tr>
+              <td><strong>Verification Clerk</strong></td>
+              <td><code>clerk.pune@mahadbt.gov.in</code></td>
+              <td><code>admin123</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <footer>
+    <p><strong>MahaDBT Scholarship Application and Status Tracker</strong></p>
+    <p>Python Flask & PostgreSQL College Full-Stack Project &copy; 2024-2025</p>
+  </footer>
+
+</body>
+</html>
